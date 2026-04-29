@@ -42,7 +42,7 @@ resource "aws_eip" "aws10_nat_eip" {
 
 resource "aws_nat_gateway" "aws10_nat_gw" {
     allocation_id = aws_eip.aws10_nat_eip.id
-    subnet_id = aws_subnet.aws10_public_subnet.id
+    subnet_id = aws_subnet.aws10_public_subnet[0].id
     tags = {
         Name = "${var.prefix}-nat-gw"
     }
@@ -62,7 +62,7 @@ resource "aws_route_table" "aws10_public_rt" {
 
 resource "aws_route_table_association" "aws10_public_rt_association" {
     count = length(var.public_subnet_cidr_block)
-    subnet_id = aws_subnet.aws10_public_subnet.id
+    subnet_id = aws_subnet.aws10_public_subnet[count.index].id
     route_table_id = aws_route_table.aws10_public_rt.id
 }
 
