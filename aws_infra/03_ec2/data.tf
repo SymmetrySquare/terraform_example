@@ -1,28 +1,17 @@
-# aws_infra/ec2/data.tf
-data "aws_vpc" "aws10_vpc" {
-  filter {
-    name   = "tag:Name"
-    values = ["${var.prefix}-vpc"]
+data "terraform_remote_state" "network" {
+  backend = "s3"
+  config = {
+    bucket = "aws10-terraform-state-bucket"
+    key    = "network/terraform.tfstate" # 01_network가 아니라 network/ 입니다!
+    region = "ap-northeast-2"
   }
 }
 
-data "aws_subnet" "aws10_public_subnet" {
-  filter {
-    name   = "tag:Name"
-    values = ["${var.prefix}-public-subnet-1"]
-  }
-}
-
-data "aws_security_group" "aws10_ssh_sg" {
-  filter {
-    name   = "tag:Name"
-    values = ["${var.prefix}-ssh-sg"]
-  }
-}
-
-data "aws_security_group" "aws10_http_sg" {
-  filter {
-    name   = "tag:Name"
-    values = ["${var.prefix}-http-sg"]
+data "terraform_remote_state" "iam" {
+  backend = "s3"
+  config = {
+    bucket = "aws10-terraform-state-bucket"
+    key    = "iam/terraform.tfstate"     # 02_iam이 아니라 iam/ 입니다!
+    region = "ap-northeast-2"
   }
 }
