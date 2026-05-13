@@ -1,14 +1,14 @@
-data "aws_vpc" "aws08_vpc" {
+data "aws_vpc" "aws10_vpc" {
   filter {
     name   = "tag:Name"
     values = ["${var.prefix}-vpc"]
   }
 }
 
-data "aws_subnets" "aws08_private_subnets" {
+data "aws_subnets" "aws10_private_subnets" {
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.aws08_vpc.id]
+    values = [data.aws_vpc.aws10_vpc.id]
   }
   filter {
     name   = "tag:Name"
@@ -16,24 +16,24 @@ data "aws_subnets" "aws08_private_subnets" {
   }
 }
 
-data "aws_security_group" "aws08_ssh_sg" {
+data "aws_security_group" "aws10_ssh_sg" {
   filter {
     name   = "tag:Name"
     values = ["${var.prefix}-ssh-sg"]
   }
 }
 
-data "aws_security_group" "aws08_http_sg" {
+data "aws_security_group" "aws10_http_sg" {
   filter {
     name   = "tag:Name"
     values = ["${var.prefix}-http-sg"]
   }
 }
 
-data "aws_iam_instance_profile" "aws08_ec2_profile" {
+data "aws_iam_instance_profile" "aws10_ec2_profile" {
   name = "${var.prefix}-ec2-instance-profile"
 }
 
-data "aws_lb_target_group" "aws08_jenkins_tg" {
+data "aws_lb_target_group" "aws10_jenkins_tg" {
   name = "${var.prefix}-alb-jenkins-group"
 }

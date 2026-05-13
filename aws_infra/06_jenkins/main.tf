@@ -1,4 +1,4 @@
-resource "aws_instance" "aws08_jenkins_server" {
+resource "aws_instance" "aws10_jenkins_server" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
   key_name               = var.key_name
@@ -9,18 +9,18 @@ resource "aws_instance" "aws08_jenkins_server" {
   }
   
   # network 모듈에서 생성한 NAT 게이트웨이와 연결된 Private Subnet 1번 사용
-  subnet_id              = data.aws_subnets.aws08_private_subnets.ids[0]
+  subnet_id              = data.aws_subnets.aws10_private_subnets.ids[0]
   
   # 프라이빗 망이므로 퍼블릭 IP는 할당하지 않음
   associate_public_ip_address = false
 
   vpc_security_group_ids = [
-    data.aws_security_group.aws08_ssh_sg.id, 
-    data.aws_security_group.aws08_http_sg.id
+    data.aws_security_group.aws10_ssh_sg.id, 
+    data.aws_security_group.aws10_http_sg.id
   ]
   
   # data.tf (33번 라인 부근)에 정의된 인스턴스 프로파일 참조
-  iam_instance_profile = data.aws_iam_instance_profile.aws08_ec2_profile.name
+  iam_instance_profile = data.aws_iam_instance_profile.aws10_ec2_profile.name
 
   user_data = <<-EOF
               #!/bin/bash
@@ -64,8 +64,8 @@ resource "aws_instance" "aws08_jenkins_server" {
 }
 
 # ALB 대상 그룹에 프라이빗 젠킨스 인스턴스 연결
-resource "aws_lb_target_group_attachment" "aws08_jenkins_attach" {
-  target_group_arn = data.aws_lb_target_group.aws08_jenkins_tg.arn
-  target_id        = aws_instance.aws08_jenkins_server.id
+resource "aws_lb_target_group_attachment" "aws10_jenkins_attach" {
+  target_group_arn = data.aws_lb_target_group.aws10_jenkins_tg.arn
+  target_id        = aws_instance.aws10_jenkins_server.id
   port             = 80
 }

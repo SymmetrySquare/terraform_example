@@ -1,7 +1,7 @@
 # aws_infra/network/main.tf
 
 # 1. VPC 생성
-resource "aws_vpc" "aws08_vpc" {
+resource "aws_vpc" "aws10_vpc" {
   cidr_block = var.vpc_cidr_block
   tags = {
     Name = "${var.prefix}-vpc"
@@ -9,9 +9,9 @@ resource "aws_vpc" "aws08_vpc" {
 }
 
 # 2. Subnets 생성
-resource "aws_subnet" "aws08_public_subnet" {
+resource "aws_subnet" "aws10_public_subnet" {
   count             = length(var.public_subnet_cidr_blocks)
-  vpc_id            = aws_vpc.aws08_vpc.id
+  vpc_id            = aws_vpc.aws10_vpc.id
   cidr_block        = var.public_subnet_cidr_blocks[count.index]
   availability_zone = var.availability_zones[count.index]
   tags = {
@@ -19,9 +19,9 @@ resource "aws_subnet" "aws08_public_subnet" {
   }
 }
 
-resource "aws_subnet" "aws08_private_subnet" {
+resource "aws_subnet" "aws10_private_subnet" {
   count             = length(var.private_subnet_cidr_blocks)
-  vpc_id            = aws_vpc.aws08_vpc.id
+  vpc_id            = aws_vpc.aws10_vpc.id
   cidr_block        = var.private_subnet_cidr_blocks[count.index]
   availability_zone = var.availability_zones[count.index]
   tags = {
@@ -30,35 +30,35 @@ resource "aws_subnet" "aws08_private_subnet" {
 }
 
 # 3. Internet Gateway 생성
-resource "aws_internet_gateway" "aws08_igw" {
-  vpc_id = aws_vpc.aws08_vpc.id
+resource "aws_internet_gateway" "aws10_igw" {
+  vpc_id = aws_vpc.aws10_vpc.id
   tags = {
     Name = "${var.prefix}-igw"
   }
 }
 
 # 4. NAT Gateway 생성
-resource "aws_eip" "aws08_nat_eip" {
+resource "aws_eip" "aws10_nat_eip" {
   domain = "vpc"
   tags = {
     Name = "${var.prefix}-nat-eip"
   }
 }
 
-resource "aws_nat_gateway" "aws08_nat_gw" {
-  allocation_id = aws_eip.aws08_nat_eip.id
-  subnet_id     = aws_subnet.aws08_public_subnet[0].id
+resource "aws_nat_gateway" "aws10_nat_gw" {
+  allocation_id = aws_eip.aws10_nat_eip.id
+  subnet_id     = aws_subnet.aws10_public_subnet[0].id
   tags = {
     Name = "${var.prefix}-nat-gw"
   }
 }
 
 # 5. Route Table 설정
-resource "aws_route_table" "aws08_public_rt" {
-  vpc_id = aws_vpc.aws08_vpc.id
+resource "aws_route_table" "aws10_public_rt" {
+  vpc_id = aws_vpc.aws10_vpc.id
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.aws08_igw.id
+    gateway_id = aws_internet_gateway.aws10_igw.id
   }
 
   tags = {
@@ -66,34 +66,34 @@ resource "aws_route_table" "aws08_public_rt" {
   }
 }
 
-resource "aws_route_table_association" "aws08_public_rt_association" {
+resource "aws_route_table_association" "aws10_public_rt_association" {
   count          = length(var.public_subnet_cidr_blocks)
-  subnet_id      = aws_subnet.aws08_public_subnet[count.index].id
-  route_table_id = aws_route_table.aws08_public_rt.id
+  subnet_id      = aws_subnet.aws10_public_subnet[count.index].id
+  route_table_id = aws_route_table.aws10_public_rt.id
 }
 
-resource "aws_route_table" "aws08_private_rt" {
+resource "aws_route_table" "aws10_private_rt" {
   count  = length(var.private_subnet_cidr_blocks)
-  vpc_id = aws_vpc.aws08_vpc.id # vpc_id 추가
+  vpc_id = aws_vpc.aws10_vpc.id # vpc_id 추가
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.aws08_nat_gw.id
+    nat_gateway_id = aws_nat_gateway.aws10_nat_gw.id
   }
   tags = {
     Name = "${var.prefix}-private-rt-${count.index + 1}"
   }
 }
 
-resource "aws_route_table_association" "aws08_private_rt_association" { 
+resource "aws_route_table_association" "aws10_private_rt_association" { 
   count          = length(var.private_subnet_cidr_blocks)
-  subnet_id      = aws_subnet.aws08_private_subnet[count.index].id
-  route_table_id = aws_route_table.aws08_private_rt[count.index].id
+  subnet_id      = aws_subnet.aws10_private_subnet[count.index].id
+  route_table_id = aws_route_table.aws10_private_rt[count.index].id
 }
 
 # 6. 보안 그룹 (SSH)
-resource "aws_security_group" "aws08_ssh_sg" {
+resource "aws_security_group" "aws10_ssh_sg" {
   name = "${var.prefix}-ssh-sg"
-  vpc_id = aws_vpc.aws08_vpc.id
+  vpc_id = aws_vpc.aws10_vpc.id
   description = "Allow SSH Access"
   ingress {
     from_port = 22
@@ -115,9 +115,9 @@ resource "aws_security_group" "aws08_ssh_sg" {
 }
 
 # 7. 보안 그룹 (HTTP/HTTPS)
-resource "aws_security_group" "aws08_http_sg" {
+resource "aws_security_group" "aws10_http_sg" {
   name = "${var.prefix}-http-sg"
-  vpc_id = aws_vpc.aws08_vpc.id
+  vpc_id = aws_vpc.aws10_vpc.id
   #description = "Allow HTTP Access"
   
   dynamic "ingress" {

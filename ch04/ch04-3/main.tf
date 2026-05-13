@@ -38,7 +38,7 @@ resource "aws_instance" "app_server" {
   instance_type = "t3.micro"
 
   tags = {
-    Name = "aws08-api-server"
+    Name = "aws10-api-server"
   }
 }
 

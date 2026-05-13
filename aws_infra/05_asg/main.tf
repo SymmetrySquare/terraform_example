@@ -1,7 +1,7 @@
 # aws_infra/asg/main.tf
 
 # 1. Launch Templete
-resource "aws_launch_template" "aws08_was_lt" {
+resource "aws_launch_template" "aws10_was_lt" {
   name_prefix = "${var.prefix}-was-lt-"
 
   # data에서 찾은 최신 AMI ID 사용
@@ -10,13 +10,13 @@ resource "aws_launch_template" "aws08_was_lt" {
   key_name = var.key_name
 
   iam_instance_profile {
-    name = data.aws_iam_instance_profile.aws08_ec2_profile.name
+    name = data.aws_iam_instance_profile.aws10_ec2_profile.name
   }
 
   network_interfaces {
     associate_public_ip_address = "false"
     security_groups = [
-      data.aws_security_group.aws08_was_sg.id
+      data.aws_security_group.aws10_was_sg.id
     ]
   }
 
@@ -33,16 +33,16 @@ resource "aws_launch_template" "aws08_was_lt" {
 }
 
 # 2. Auto Scaling Group
-resource "aws_autoscaling_group" "aws08_was_asg" {
+resource "aws_autoscaling_group" "aws10_was_asg" {
   name = "${var.prefix}-was-asg"
-  vpc_zone_identifier = data.aws_subnets.aws08_private_subnets.ids
+  vpc_zone_identifier = data.aws_subnets.aws10_private_subnets.ids
 
   launch_template {
-    id      = aws_launch_template.aws08_was_lt.id
+    id      = aws_launch_template.aws10_was_lt.id
     version = "$Latest"
   }
 
-  target_group_arns = [data.aws_lb_target_group.aws08_was_tg.arn]
+  target_group_arns = [data.aws_lb_target_group.aws10_was_tg.arn]
 
   min_size = "1"
   max_size = "3"
